@@ -39,24 +39,6 @@ export async function createTodos(parsedUserId: string, createTodoRequest: Creat
 
 export async function deleteTodos(todoId: string, userId: string) {
 
-
-  // logger.info(`Deleting todoId: ${todoId} userId: ${userId} from table: ${todosTable}`)
-  // const newItem = await docClient.query({
-  //   TableName: todosTable,
-  //   KeyConditionExpression: 'userId = :userId',
-  //   ExpressionAttributeValues: {
-  //     ':userId': userId
-  //   }
-  // }).promise()
-
-  // const key = {
-  //   userId: userId, 
-  //   createdAt: newItem.Items[0].createdAt
-  // }
-
-  // logger.info(`Key = ${key}`)
-
-
   await docClient.delete({
     TableName: todosTable,
     Key: {
