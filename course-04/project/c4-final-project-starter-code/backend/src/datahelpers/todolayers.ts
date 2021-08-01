@@ -52,13 +52,17 @@ export async function updateTodos(todoId: string, userId: string, updatedTodo: U
   await docClient.update({
    TableName: todosTable, 
    Key: {
-    todoId, userId
+    todoId: todoId, 
+    userId: userId
    }, 
    UpdateExpression: 'set #name = :name, dueDate = :dueDate, done = :done', 
    ExpressionAttributeValues: {
-     ":name": updatedTodo.name,
-     ":dueDate": updatedTodo.dueDate,
-     ":done": updatedTodo.done
+     ':name': updatedTodo.name,
+     ':dueDate': updatedTodo.dueDate,
+     ':done': updatedTodo.done
+   },
+   ExpressionAttributeNames: {
+     "#name": "name"
    }
  }).promise()
 }
@@ -89,22 +93,22 @@ export async function generateUploadUrl(id: string) :Promise<string> {
   const attachmentUrl = s3.getSignedUrl('putObject',{
     Bucket: todosBucket, 
     Key: id,
-    Expires: '30000'
+    Expires: 30000
   })
   logger.info(`Signed Url: ${attachmentUrl}`)
   return attachmentUrl
 }
 
 export async function updateUrl(attachmentUrl: string, todoId: string ,userId: string) {
+  logger.info(`update url, attachmentUrl: ${attachmentUrl}`);
   await docClient.update({
     TableName: todosTable, 
     Key: {
-      todoId: todoId, 
-      userId: userId
+      todoId, userId
     }, 
-    UpdateExpression: 'set attachmentUrl = :attachmentUrl', 
+    UpdateExpression: "set attachmentUrl = :attachmentUrl", 
     ExpressionAttributeValues: {
-      ':attachmentUrl': attachmentUrl
+      ":attachmentUrl": `https://todos-bucket-rochana-dev.s3.amazonaws.com/${todoId}`
     }
   }).promise()
 }

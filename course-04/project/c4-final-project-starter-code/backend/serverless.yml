@@ -4,6 +4,7 @@ service:
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
+#  - serverless-reqvalidator-plugin
 
 provider:
   name: aws
@@ -14,6 +15,15 @@ provider:
   environment:
     TODOS_TABLE: todos-table-rochana-${self:provider.stage}
     TODOS_S3_BUCKET: todos-bucket-rochana-${self:provider.stage}
+custom: 
+  documentation: 
+    models: 
+      - name: "CreateTodoRequest"
+        contentType: application/json
+        schema: ${file(src/models/create-todo-request.json)}
+      - name: "UpdateTodoRequest"
+        contentType: application/json
+        schema: ${file(src/models/update-todo-request.json)}
 
 functions:
 
@@ -45,6 +55,16 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
+          request: 
+            schema: 
+              application/json: ${file(src/models/create-todo-request.json)}
+#          reqValidatorName: RequestBodyValidator
+          # documentation: 
+          #   summary: "Create a new todo"
+          #   description: "Create a new todo"
+          # methodResponses: 
+          #   requestModels: 
+          #     'application/json': "CreateTodoRequest"
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -98,15 +118,23 @@ functions:
           - s3:PutObject
           - s3:GetObject
           - s3:'*'
-        Resource: arn:aws:s3:::todos-bucket-rochana-dev/*
+        Resource: arn:aws:s3:::${self:provider.environment.TODOS_S3_BUCKET}/*
       - Effect: Allow
         Action:
           - dynamodb:Query
           - dynamodb:UpdateItem
-        Resource: arn:aws:dynamodb:us-east-1:632497565445:table/todos-table-rochana-dev
+        Resource: arn:aws:dynamodb:us-east-1:*:table/todos-table-rochana-dev
 
 resources:
   Resources:
+    RequestBodyValidator: 
+      Type: AWS::ApiGateway::RequestValidator
+      Properties: 
+        Name: 'request-body-validator'
+        RestApiId: 
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: true
     GatewayResponseDefault4XX:
       Type: AWS::ApiGateway::GatewayResponse
       Properties:
@@ -132,7 +160,7 @@ resources:
           - AttributeName: todoId
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
-        TableName: ${self:provider.environment.TODOS_TABLE}
+        TableName: ${self:provider.environment.TODOS_TABLE}         
     
     AttachmentsBucket: 
       Type: AWS::S3::Bucket
@@ -150,7 +178,7 @@ resources:
                 - POST
                 - DELETE
                 - HEAD
-              MaxAge: 3000
+              MaxAge: 30000
 
     AttachmentsBucketPolicy:
       Type: AWS::S3::BucketPolicy

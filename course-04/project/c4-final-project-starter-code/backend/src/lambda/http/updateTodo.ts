@@ -22,9 +22,10 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Credentials': true
-  },
-  body: ''
+  }, 
+    body: JSON.stringify({})
   }
+  
 
   // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
 
