@@ -19,13 +19,13 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   // update attachment url 
   // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
   return {
-    statusCode: 200, 
+    statusCode: 201, 
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': true
     }, 
     body: JSON.stringify({
-      attachmentUrl
+      uploadUrl: attachmentUrl
     })
   }
 }

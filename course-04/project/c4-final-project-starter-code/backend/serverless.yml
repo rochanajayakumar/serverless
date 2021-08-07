@@ -168,9 +168,7 @@ resources:
         BucketName: ${self:provider.environment.TODOS_S3_BUCKET}
         CorsConfiguration:
           CorsRules:
-            - AllowedOrigins:
-                - '*'
-              AllowedHeaders:
+            - AllowedHeaders:
                 - '*'
               AllowedMethods:
                 - GET
@@ -178,7 +176,10 @@ resources:
                 - POST
                 - DELETE
                 - HEAD
+              AllowedOrigins:
+                - '*'
               MaxAge: 30000
+              
 
     AttachmentsBucketPolicy:
       Type: AWS::S3::BucketPolicy
@@ -187,7 +188,7 @@ resources:
           Id: MyPolicy
           Version: "2012-10-17"
           Statement:
-            - Sid: PublicReadForGetBucketObjects
+            - Sid: PublicReadWriteBucketPolicy
               Effect: Allow
               Principal: '*'
               Action: 
